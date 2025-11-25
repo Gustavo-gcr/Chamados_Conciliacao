@@ -7,22 +7,19 @@ import time
 # --- CARREGAMENTO SEGURO DOS SECRETS DO STREAMLIT ---
 try:
     # --- CONFIGURAÇÕES GERAIS DA API ---
-    # Carrega as URLs, Token, IDs e o Mapeamento de Atendentes do st.secrets
     API_URL = st.secrets["tomticket"]["api_url"]
     LINK_OPERATOR_URL = st.secrets["tomticket"]["link_operator_url"]
     TOKEN = st.secrets["tomticket"]["token"]
     CUSTOMER_ID = st.secrets["tomticket"]["customer_id"]
     DEPARTMENT_ID = st.secrets["tomticket"]["department_id"]
-    PRIORITY = 2 # Prioridade não é um secret, mantida fixa
+    PRIORITY = 2 
     
-    # --- MAPEAMENTO DE ATENDENTES COM OS NOVOS IDs ---
-    # Carrega o dicionário completo do st.secrets
+    # --- MAPEAMENTO DE ATENDENTES ---
     OPERATOR_MAP = dict(st.secrets["operator_map"])
 
 except KeyError as e:
     st.error(f"❌ Erro ao carregar as chaves do Streamlit Secrets: **{e}**.")
-    st.error("Por favor, verifique se seu arquivo `.streamlit/secrets.toml` ou as 'Secrets' do Streamlit Cloud estão configuradas corretamente conforme o exemplo.")
-    st.stop() # Interrompe a execução se os secrets não puderem ser carregados
+    st.stop() 
 
 
 # === HEADERS ===
@@ -30,8 +27,8 @@ headers = {
     "Authorization": f"Bearer {TOKEN}"
 }
 
-# --- MAPEAMENTO DE CATEGORIAS (BASEADO NO CÓDIGO ANTERIOR) ---
-# Este dicionário continua no código, pois não contém dados sensíveis.
+# --- MAPEAMENTO DE CATEGORIAS ---
+# Não foi necessário alterar nada aqui, pois as mensagens da Yasmin já existiam no mapeamento.
 CATEGORY_MAP = {
     "Planilha de retorno e analisar todos que estão enviados ao Banco do dia. Mandar no e-mail quando finalizar;": "aa426ddcb6b56b8e1c71ed7047ae3487",
     "Lançamentos do Bloqueio, desbloqueio, estorno, resgate e aplicação;": "54f81eaf6d56ff0e9a3693ad03c0ca20",
@@ -46,28 +43,54 @@ CATEGORY_MAP = {
 }
 
 
-# --- DADOS DA PLANILHA ---
-# Estrutura de dados baseada na imagem que você anexou
+# --- DADOS DA PLANILHA (ATUALIZADO) ---
 data = [
-    # Atendente, Nome do Chamado, Horário, Mensagem, Prazo
+    # ==========================
+    # --- PERÍODO DA MANHÃ ---
+    # ==========================
+    
+    # 09:00
     ("Mariana", "Planilha de retorno", "Manhã", "Planilha de retorno e analisar todos que estão enviados ao Banco do dia. Mandar no e-mail quando finalizar;", "09:00"),
+    
+    # 10:00 - Lançamentos Manuais
+    ("Yasmin", "Lançamentos manuais", "Manhã", "Lançamentos do Bloqueio, desbloqueio, estorno, resgate e aplicação;", "10:00"),
     ("Brener", "Lançamentos manuais", "Manhã", "Lançamentos do Bloqueio, desbloqueio, estorno, resgate e aplicação;", "10:00"),
     ("Mariana", "Lançamentos manuais", "Manhã", "Lançamentos do Bloqueio, desbloqueio, estorno, resgate e aplicação;", "10:00"),
+    
+    # 10:00 - Sem Sitex
+    ("Yasmin", "Sem Sitex", "Manhã", "Subir as contas sem sitex do dia", "10:00"),
     ("Brener", "Sem Sitex", "Manhã", "Subir as contas sem sitex do dia", "10:00"),
     ("Mariana", "Sem Sitex", "Manhã", "Subir as contas sem sitex do dia", "10:00"),
+    
+    # 12:00 - Análise de Débitos
+    ("Yasmin", "Analise de débitos", "Manhã", "Analisar débitos. Enviar no meu e-mail as contas que continuaram com erro e estão com dúvidas. Dessa forma, os débitos tem que estar zerado.", "12:00"),
     ("Brener", "Analise de débitos", "Manhã", "Analisar débitos. Enviar no meu e-mail as contas que continuaram com erro e estão com dúvidas. Dessa forma, os débitos tem que estar zerado.", "12:00"),
     ("Mariana", "Analise de débitos", "Manhã", "Analisar débitos. Enviar no meu e-mail as contas que continuaram com erro e estão com dúvidas. Dessa forma, os débitos tem que estar zerado.", "12:00"),
-    ("Brener", "Analise de créditos", "Tarde", "Analisar créditos. Enviar no meu e-mail relatório dos valores que não conseguiram identificar. Dessa forma, os créditos tem que estar todos analisados.", "16:00"),
-    ("Mariana", "Relatório de Saldos", "Tarde", "Enviar planilha de Saldos por e-mail;", "17:00"),
-    ("Davi", "Contas Sem Sitex", "Tarde", "Lançar tarifa;", "16:00"),
-    ("Yasmin", "Contas Sem Sitex", "Tarde", "Verificar saldo do dia;", "16:00"),
+
+
+    # ==========================
+    # --- PERÍODO DA TARDE ---
+    # ==========================
+
+    # 14:00
     ("Davi", "Recebimentos das centrais", "Tarde", "Fazer analise das centrais;", "14:00"),
+
+    # 16:00
+    ("Davi", "Contas Sem Sitex", "Tarde", "Lançar tarifa;", "16:00"),
+    ("Brener", "Analise de créditos", "Tarde", "Analisar créditos. Enviar no meu e-mail relatório dos valores que não conseguiram identificar. Dessa forma, os créditos tem que estar todos analisados.", "16:00"),
+
+    # 17:00 - Relatório de Saldos
+    ("Yasmin", "Relatório de Saldos", "Tarde", "Enviar planilha de Saldos por e-mail;", "17:00"),
+    ("Mariana", "Relatório de Saldos", "Tarde", "Enviar planilha de Saldos por e-mail;", "17:00"),
+
+    # 18:00 - Lançamento no Controle
+    ("Yasmin", "Lançamento no controle", "Tarde", "Lançar valores do controle que foram avisados no dia anterior e não foram feitos ainda dentro do molde combinado; Enviar no e-mail valores que não conseguiram identificar o que fazer.", "18:00"),
     ("Brener", "Lançamento no controle", "Tarde", "Lançar valores do controle que foram avisados no dia anterior e não foram feitos ainda dentro do molde combinado; Enviar no e-mail valores que não conseguiram identificar o que fazer.", "18:00"),
     ("Mariana", "Lançamento no controle", "Tarde", "Lançar valores do controle que foram avisados no dia anterior e não foram feitos ainda dentro do molde combinado; Enviar no e-mail valores que não conseguiram identificar o que fazer.", "18:00"),
-    ("Yasmin", "Lançamento no controle", "Tarde", "Lançar valores do controle que foram avisados no dia anterior e não foram feitos ainda dentro do molde combinado; Enviar no e-mail valores que não conseguiram identificar o que fazer.", "18:00"),
+    
+    # 18:00 - Outros
     ("Brener", "Analise de créditos", "Tarde", "Analisar créditos. Enviar no meu e-mail relatório dos valores que não conseguiram identificar. Dessa forma, os créditos tem que estar todos analisados.", "18:00")
 ]
-
 # Cria o DataFrame
 df = pd.DataFrame(data, columns=["Atendente", "Nome", "Horário", "Mensagem", "Prazo"])
 
@@ -118,7 +141,6 @@ def create_ticket(chamado):
                     st.success(f"✅ **{chamado['Nome']}** ({atendente}) criado e vinculado com sucesso! ")
                     return True
                 else:
-                    # Continua mesmo se a vinculação falhar, pois o chamado foi criado
                     st.warning(f"⚠️ **{chamado['Nome']}** ({atendente}) criado, mas erro ao vincular atendente.")
                     return False
             else:
@@ -179,7 +201,6 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.button("☀️ Rodar Chamados da Manhã", use_container_width=True, type="primary"):
-        # Garante que o estado seja limpo antes de rodar
         st.session_state["executed"] = "Manhã" 
         run_automation("Manhã", df)
 
