@@ -320,4 +320,4 @@ with st.expander("👁️ Ver lista completa (resumo)"):
         pd.DataFrame(chamados, columns=["Atendente", "Nome", "Horário", "Mensagem", "Prazo"]),
         use_container_width=True,
         hide_index=True,
-    ).
+    )
