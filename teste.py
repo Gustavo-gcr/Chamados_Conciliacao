@@ -231,13 +231,13 @@ def dialog_gerenciar():
                         if st.button("🗑️", key=f"del_{i}", help="Excluir este chamado"):
                             st.session_state["chamados"].pop(i)
                             salvar_chamados(st.session_state["chamados"])
-                            st.rerun(scope="fragment")
+                            st.rerun()  # rerun completo: atualiza a página toda
 
         st.markdown("---")
         if st.button("↩️ Restaurar lista padrão", use_container_width=True):
             st.session_state["chamados"] = list(DEFAULT_CHAMADOS)
             salvar_chamados(st.session_state["chamados"])
-            st.rerun(scope="fragment")
+            st.rerun()  # rerun completo: atualiza a página toda
 
     # ---------- MODO ADICIONAR ----------
     elif modo == "adicionar":
@@ -252,7 +252,7 @@ def dialog_gerenciar():
                     st.session_state["chamados"].append(valores)
                     salvar_chamados(st.session_state["chamados"])
                     st.session_state["modo_dialog"] = "lista"
-                    st.rerun(scope="fragment")
+                    st.rerun()  # rerun completo: atualiza a página toda
         with col_v:
             if st.button("← Voltar", use_container_width=True):
                 st.session_state["modo_dialog"] = "lista"
@@ -276,13 +276,13 @@ def dialog_gerenciar():
                     st.session_state["chamados"][idx] = valores
                     salvar_chamados(st.session_state["chamados"])
                     st.session_state["modo_dialog"] = "lista"
-                    st.rerun(scope="fragment")
+                    st.rerun()  # rerun completo: atualiza a página toda
         with col_x:
             if st.button("🗑️ Excluir", use_container_width=True):
                 st.session_state["chamados"].pop(idx)
                 salvar_chamados(st.session_state["chamados"])
                 st.session_state["modo_dialog"] = "lista"
-                st.rerun(scope="fragment")
+                st.rerun()  # rerun completo: atualiza a página toda
         with col_v:
             if st.button("← Voltar", use_container_width=True):
                 st.session_state["modo_dialog"] = "lista"
