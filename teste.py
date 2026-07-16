@@ -156,7 +156,6 @@ def formulario_chamado(chamado=None, key_prefix="novo"):
     """Renderiza o formulário. Retorna dict com os valores ou None."""
     padrao = chamado or {}
     atendentes = sorted(OPERATOR_MAP.keys())
-    mensagens = sorted(CATEGORY_MAP.keys())
 
     col_a, col_b = st.columns(2)
     with col_a:
@@ -181,14 +180,19 @@ def formulario_chamado(chamado=None, key_prefix="novo"):
     with col_d:
         prazo = st.text_input("⏰ Prazo (ex: 09:00)", value=padrao.get("Prazo", "09:00"), key=f"{key_prefix}_prazo")
 
-    idx_msg = mensagens.index(padrao["Mensagem"]) if padrao.get("Mensagem") in mensagens else 0
-    mensagem = st.selectbox("💬 Mensagem", mensagens, index=idx_msg, key=f"{key_prefix}_msg")
+    mensagem = st.text_area(
+        "💬 Mensagem",
+        value=padrao.get("Mensagem", ""),
+        key=f"{key_prefix}_msg",
+        height=120,
+        placeholder="Escreva a mensagem do chamado...",
+    )
 
     return {
         "Atendente": atendente,
         "Nome": nome.strip(),
         "Horário": turno,
-        "Mensagem": mensagem,
+        "Mensagem": mensagem.strip(),
         "Prazo": prazo.strip(),
     }
 
@@ -242,8 +246,8 @@ def dialog_gerenciar():
         col_s, col_v = st.columns(2)
         with col_s:
             if st.button("💾 Salvar", type="primary", use_container_width=True):
-                if not valores["Nome"]:
-                    st.error("Informe o nome do chamado.")
+                if not valores["Nome"] or not valores["Mensagem"]:
+                    st.error("Informe o nome e a mensagem do chamado.")
                 else:
                     st.session_state["chamados"].append(valores)
                     salvar_chamados(st.session_state["chamados"])
@@ -266,8 +270,8 @@ def dialog_gerenciar():
         col_s, col_x, col_v = st.columns(3)
         with col_s:
             if st.button("💾 Salvar alterações", type="primary", use_container_width=True):
-                if not valores["Nome"]:
-                    st.error("Informe o nome do chamado.")
+                if not valores["Nome"] or not valores["Mensagem"]:
+                    st.error("Informe o nome e a mensagem do chamado.")
                 else:
                     st.session_state["chamados"][idx] = valores
                     salvar_chamados(st.session_state["chamados"])
